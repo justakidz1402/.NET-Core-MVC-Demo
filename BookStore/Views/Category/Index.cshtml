@@ -1,0 +1,106 @@
+﻿@model PaginatedList<BookStore.Models.Domain.Category>
+@{
+    ViewData["Title"] = "Category Management";
+}
+
+<div class="employee-header" style="
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 50px;
+">
+    <div style="
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+">
+        <h2 style="margin:0; margin-right:10px">Category Management</h2>
+        <a asp-area="" asp-controller="Category" asp-action="Add">
+            <i style="color:blue" class="bi bi-plus-circle-fill"></i>
+        </a>
+    </div>
+
+    <form asp-action="Index" method="get" style="display:flex;align-items: end;">
+        <div class="form-group">
+            <label for="searchString">Search by name:</label>
+            <input type="text" name="searchString" class="form-control" />
+        </div>
+        <input style="height:50%" type="submit" value="Search" class="btn btn-primary" />
+    </form>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Description</th>
+            <th scope="col">Status</th>
+            <th scope="col" style="display:flex; align-items:center; justify-content:center">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var category in Model)
+        {
+            <tr>
+                <th scope="row">@category.Id</th>
+                <td>@category.Name</td>
+                <td>@category.Description</td>
+                <td>
+                    @if (category.Status)
+                    {
+                        <i style="color:green" class="bi bi-check-circle-fill"></i>
+                    }
+                    else
+                    {
+                        <i style="color:red" class="bi bi-x-circle-fill"></i>
+                    }
+                </td>
+                <td>
+                    <div style="display:flex; justify-content:space-around; align-items:center">
+                        <a href="Category/Update/@category.Id">
+                            <button type="button" class="btn btn-primary">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+                        </a>
+                        <form asp-action="ChangeStatus" asp-controller="Category" method="post">
+                            <input type="hidden" name="Id" value="@category.Id" />
+                            <button type="submit" class="btn @(category.Status?"btn-danger": "btn-success")">
+                                <i class="bi bi-arrow-repeat"></i>
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+
+<div class="container" style="display: flex;align-items: center;justify-content: flex-end;">
+    <p style="margin-right:10px">Page @Model.PageIndex of @Model.TotalPages</p>
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            <li class="page-item @prevDisabled">
+                <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.PageIndex - 1)" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-pageNumber="@i">@i</a>
+                </li>
+            }
+            <li class="page-item @nextDisabled">
+                <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.PageIndex + 1)" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
